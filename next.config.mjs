@@ -5,10 +5,11 @@ import withNextIntl from "next-intl/plugin";
 const nextIntlConfig = withNextIntl();
 const nextConfig = {
   images: {
+    domains: ["hamidexcoffee.vn"], // Thêm tên miền bạn đang sử dụng vào đây
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "**",
+        protocol: "https", // Đảm bảo protocol là HTTPS nếu tên miền của bạn sử dụng HTTPS
+        hostname: "admin.hamidexcoffee.vn", // Thêm tên miền cụ thể
       },
     ],
   },

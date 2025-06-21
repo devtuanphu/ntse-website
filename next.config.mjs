@@ -11,6 +11,11 @@ const nextConfig = {
         protocol: "https", // Đảm bảo protocol là HTTPS nếu tên miền của bạn sử dụng HTTPS
         hostname: "admin.hamidexcoffee.vn", // Thêm tên miền cụ thể
       },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: "1338",
+      },
     ],
   },
   env: {

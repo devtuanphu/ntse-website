@@ -311,30 +311,22 @@ const HeaderNew = (params: any) => {
                     <li
                       key={item.key}
                       className={`border-b-2 border-transparent flex items-center`}
-                      onMouseEnter={() => {
-                        handleMouseEnter(item.key, item.showIcon);
-                      }}
-                      onMouseLeave={handleMouseLeave}>
+                    >
                       <div
                         className={`font-inter text-base font-medium leading-6 hover:text-[#28A645] ${
                           isActive ? "text-[#28A645]" : "text-[#3B559E]"
                         } text-left flex items-center gap-3 cursor-pointer 
-                    ${activeKey === item.key ? "text-[#28A645]" : ""}`}>
+                    ${activeKey === item.key ? "text-[#28A645]" : ""}`}
+                      >
                         <Link href={item.pathname}>{item.label}</Link>
-                        {item.showIcon &&
-                          (activeKey === item.key ? (
-                            <IconAngleUp width="12" height="12" />
-                          ) : (
-                            <IconAngleDown width="12" height="12" />
-                          ))}
                       </div>
                     </li>
                   );
                 })}
               </ul>
-              <div className="hidden laptop:flex">
+              {/* <div className="hidden laptop:flex">
                 <LanguageSwitch />
-              </div>
+              </div> */}
             </div>
           </div>
           <div className="mobile:flex laptop:hidden w-full h-[72px] px-[15px] py-4 bg-white justify-between items-center inline-flex">
@@ -344,7 +336,8 @@ const HeaderNew = (params: any) => {
             <div className="w-8 h-8 px-[0.85px] py-[6.30px] justify-center items-center">
               <button
                 className="w-[30.30px] h-[19.40px] relative"
-                onClick={toggleMenu}>
+                onClick={toggleMenu}
+              >
                 <IconMenu />
               </button>
 
@@ -355,16 +348,6 @@ const HeaderNew = (params: any) => {
               />
             </div>
           </div>
-
-          <MegaMenu
-            menuItems={activeItem}
-            locale={locale}
-            loading={loading}
-            activeKey={activeKey}
-            isMenuOpen={isMenuOpen}
-            setIsMenuOpen={setIsMenuOpen}
-            handleMouseLeave={handleMouseLeave}
-          />
         </div>
       </header>
       {isMenuOpen && (

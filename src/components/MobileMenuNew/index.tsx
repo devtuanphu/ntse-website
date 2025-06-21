@@ -118,68 +118,6 @@ const MobileMenuNew = ({
     }
   };
 
-  const fetchDataVeChungToi = async () => {
-    if (cachedData["Về chúng tôi"]) {
-      return cachedData["Về chúng tôi"]; // Return cached data if it exists
-    }
-
-    const listEndPoint = [
-      `${process.env.URL_API}/api/ve-chung-toi?populate=main&locale=${locale}`,
-      `${process.env.URL_API}/api/goc-chuyen-gia?locale=${locale}`,
-      `${process.env.URL_API}/api/cong-ty-thanh-vien?locale=${locale}`,
-      locale === "en"
-        ? `${process.env.URL_API}/api/danh-muc-cons?locale=en&filters[category][$eqi]=Dự án&filters[name][$eqi]=Community Project`
-        : `${process.env.URL_API}/api/danh-muc-cons?filters[category]=Dự án&filters[name][$eqi]=Dự án cộng đồng`,
-    ];
-    try {
-      const responses = await Promise.all(
-        listEndPoint.map((endpoint) => apiService.get<any>(endpoint))
-      );
-
-      const [veChungToi, gocChuyenGia, congTyThanhVien, duAnCongDong] =
-        responses.map((res) => res.data);
-
-      const data = {
-        description: veChungToi.attributes.main.description,
-        danh_muc_cons: [
-          {
-            id: 1,
-            name: veChungToi.attributes.main.name,
-            description: veChungToi.attributes.main.description,
-            slug: "/ve-chung-toi",
-          },
-          {
-            id: 2,
-            name: t("expertopinion"),
-            description: gocChuyenGia?.attributes?.description,
-            slug: "/goc-chuyen-gia",
-          },
-          {
-            id: 3,
-            name: t("member_company"),
-            description: congTyThanhVien?.attributes?.description,
-            slug: "/cong-ty-thanh-vien",
-          },
-          {
-            id: 4,
-            name: duAnCongDong[0]?.attributes?.name,
-            description: duAnCongDong[0]?.attributes?.description,
-            slug: duAnCongDong[0]?.attributes?.slug,
-          },
-        ],
-      };
-
-      setCachedData((prev) => ({
-        ...prev,
-        "Về chúng tôi": data,
-      }));
-
-      return data;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
   const fetchHeader = async (key: string) => {
     if (cachedData[key]) {
       return; // Skip API call if data is already cached
@@ -206,37 +144,6 @@ const MobileMenuNew = ({
       console.error(`Error fetching data for ${key}:`, error);
     }
   };
-
-  useEffect(() => {
-    if (isOpen) {
-      setLoading(true);
-      const fetchAllHeaders = async () => {
-        const promises = menuItems.map(async (item) => {
-          if (
-            !cachedData[item.key] &&
-            item.key !== "Tin tức" &&
-            item.key !== "Đối tác"
-          ) {
-            if (item.key === "Về chúng tôi") {
-              const data = await fetchDataVeChungToi();
-              setCachedData((prev) => ({
-                ...prev,
-                [item.key]: {
-                  ...menuItems.find((menuItem) => menuItem.key === item.key),
-                  ...data,
-                },
-              }));
-            } else {
-              await fetchHeader(item.key);
-            }
-          }
-        });
-        await Promise.all(promises);
-        setLoading(false);
-      };
-      fetchAllHeaders();
-    }
-  }, [isOpen]);
 
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [openSubKeys, setOpenSubKeys] = useState<{ [key: string]: string[] }>(
@@ -304,7 +211,8 @@ const MobileMenuNew = ({
     <div
       className={`${
         isOpen ? "fixed" : "hidden"
-      } top-0 left-0 w-full h-full bg-white z-50 overflow-y-auto`}>
+      } top-0 left-0 w-full h-full bg-white z-50 overflow-y-auto`}
+    >
       <div className="flex justify-between items-center mb-4 shadow px-[31px] py-4">
         <Link href={`/${locale}`} className="my-auto">
           <Image src={NTSLogo.src} alt="NTS Logo" width={60} height={40} />
@@ -313,13 +221,14 @@ const MobileMenuNew = ({
           <IconClose />
         </button>
       </div>
-      <LanguageSwitch />
+
       {loading ? (
         <Menu mode="inline" className="mt-4 flex flex-col gap-2">
           {Array.from({ length: 7 }).map((_, index) => (
             <Menu.Item
               key={index}
-              className="text-black text-lg font-semibold leading-relaxed">
+              className="text-black text-lg font-semibold leading-relaxed"
+            >
               <Skeleton height={30} />
             </Menu.Item>
           ))}
@@ -329,7 +238,8 @@ const MobileMenuNew = ({
           mode="inline"
           className="mt-4 flex flex-col gap-2"
           openKeys={openKeys}
-          onOpenChange={onOpenChange}>
+          onOpenChange={onOpenChange}
+        >
           {menuItems.map((item: any) => {
             const cachedItem = cachedData[item.key];
             if (
@@ -339,10 +249,12 @@ const MobileMenuNew = ({
               return (
                 <Menu.Item
                   key={item.key}
-                  className="text-black text-lg font-semibold leading-relaxed">
+                  className="text-black text-lg font-semibold leading-relaxed"
+                >
                   <Link
                     href={item.pathname || "/"}
-                    className="!text-black !text-lg !font-semibold leading-relaxed">
+                    className="!text-black !text-lg !font-semibold leading-relaxed"
+                  >
                     {item.name}
                   </Link>
                 </Menu.Item>
@@ -352,16 +264,19 @@ const MobileMenuNew = ({
               <Menu.SubMenu
                 key={item.key}
                 title={renderTitleWithIcon(item.name, item.key)}
-                className="text-black text-lg font-semibold px-0">
+                className="text-black text-lg font-semibold px-0"
+              >
                 <Menu
                   mode="inline"
                   openKeys={openSubKeys[item.key] || []}
-                  onOpenChange={(keys) => onSubOpenChange(item.key, keys)}>
+                  onOpenChange={(keys) => onSubOpenChange(item.key, keys)}
+                >
                   {item.key === "Về chúng tôi" ? null : (
                     <Menu.Item className="text-[#3B559E] text-base font-normal leading-relaxed">
                       <Link
                         href={item.pathname || "/"}
-                        className="!text-[#3B559E] text-base font-normal leading-relaxed px-0">
+                        className="!text-[#3B559E] text-base font-normal leading-relaxed px-0"
+                      >
                         {locale === "vi" ? "Đến trang " : "Go to "} {item.name}
                       </Link>
                     </Menu.Item>
@@ -375,10 +290,12 @@ const MobileMenuNew = ({
                       return (
                         <Menu.Item
                           key={danhMucItem.slug}
-                          className="!text-base !font-normal !text-[#000]">
+                          className="!text-base !font-normal !text-[#000]"
+                        >
                           <Link
                             href={danhMucItem.slug || "/"}
-                            className="!text-base !font-normal !text-[#000] ">
+                            className="!text-base !font-normal !text-[#000] "
+                          >
                             {danhMucItem.name}
                           </Link>
                         </Menu.Item>
@@ -392,11 +309,13 @@ const MobileMenuNew = ({
                           danhMucItem.slug,
                           item.key
                         )}
-                        className="!text-base !font-normal !text-[#000] ">
+                        className="!text-base !font-normal !text-[#000] "
+                      >
                         <Menu.Item className="text-[#3B559E] text-base font-normal leading-relaxed">
                           <Link
                             href={danhMucItem.slug || "/"}
-                            className="!text-[#3B559E] text-base font-normal leading-relaxed">
+                            className="!text-[#3B559E] text-base font-normal leading-relaxed"
+                          >
                             {locale === "vi" ? "Đến trang " : "Go to "}{" "}
                             {danhMucItem.name}
                           </Link>
@@ -406,10 +325,12 @@ const MobileMenuNew = ({
                           .map((baiVietItem: any) => (
                             <Menu.Item
                               key={baiVietItem.slug}
-                              className="text-[#3B559E] text-base font-normal leading-relaxed">
+                              className="text-[#3B559E] text-base font-normal leading-relaxed"
+                            >
                               <Link
                                 href={baiVietItem.slug || "/"}
-                                className="!text-gray-500 !text-base !font-normal leading-relaxed">
+                                className="!text-gray-500 !text-base !font-normal leading-relaxed"
+                              >
                                 {baiVietItem.title}
                               </Link>
                             </Menu.Item>
